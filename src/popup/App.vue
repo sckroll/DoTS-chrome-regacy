@@ -7,25 +7,8 @@
         >DoTS</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- <v-menu offset-y v-if="this.token">
-        <template v-slot:activator="{ on }">
-          <v-avatar :color="user.color" v-on="on" style="cursor: pointer;" v-ripple>
-            <span>{{ user.lastName.charAt(0) }}</span>
-          </v-avatar>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(item, index) in items"
-            :key="index"
-            :disabled="item.disabled"
-            @click="item.action"
-          >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu> -->
-      <v-avatar v-if="user.email" :color="user.color" style="cursor: pointer;" v-ripple>
-        <span @click="dotsTab" class="subtitle-1 white--text">{{ user.lastName.charAt(0) }}</span>
+      <v-avatar v-if="user.email" :color="user.color" style="cursor: pointer;" v-ripple @click="dotsTab">
+        <span class="subtitle-1 white--text">{{ user.lastName.charAt(0) }}</span>
       </v-avatar>
     </v-app-bar>
 
@@ -42,9 +25,9 @@
             no-resize
           ></v-textarea>
           <v-layout class="text-center">
-            <v-btn color="success" tile large @click="setData">현재 페이지에 대해 마킹</v-btn>
+            <v-btn color="success" tile large @click="tagPage">현재 페이지에 태그 표시</v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-4" tile large dark @click="getData">메모 저장</v-btn>
+            <v-btn color="blue darken-4" tile large dark @click="saveMemo">메모 저장</v-btn>
           </v-layout>
         </v-flex>
         <v-flex v-else xl12>
@@ -62,6 +45,7 @@
 
 <script>
 import jwtDecode from 'jwt-decode';
+import axios from 'axios'
 
 export default {
   name: 'App',
@@ -73,19 +57,7 @@ export default {
         lastName: '',
         email: '',
         color: ''
-      },
-      items: [
-        {
-          title: '계정 관리',
-          action: '',
-          disabled: true
-        },
-        {
-          title: '로그아웃',
-          action: this.signout,
-          disabled: false
-        }
-      ]
+      }
     }
   },
   created() {
@@ -104,24 +76,42 @@ export default {
       this.$store.commit('deleteToken')
     },
     dotsTab () {
-      chrome.tabs.query({
-          // 현재 탭의 인덱스 정보 획득
-          currentWindow: true,
-          active: true
-        }, function(tabArray) {
-        // 새 탭 생성
-        chrome.tabs.create({
-          index: tabArray[0].index + 1,
-          url: 'http://localhost:8080/login'
-          // url: 'http://dots-00.appspot.com/login'
-        })
-      })
+      window.open('http://localhost:8080/login');
+      // window.open('https://dots-00.appspot.com/login');
     },
-    setData () {
+    tagPage () {
+      var userEmail = this.user.email
 
+      chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
+        axios.post('http://localhost:3000/data/tag', {
+          currURL: tabs[0].url,
+          email: userEmail
+        })
+        .then((result) => {
+          if (result.data.error) throw new Error(result.data.error)
+
+          alert('현재 페이지에 태그를 표시하였습니다.')
+        }).catch((err) => {
+          alert(err)
+        });
+      });
     },
-    getData () {
-      
+    saveMemo () {
+      var newMemo = this.memo
+
+      chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
+        axios.post('http://localhost:3000/data/memo', {
+          currURL: tabs[0].url,
+          memo: newMemo
+        })
+        .then((result) => {
+          if (result.data.error) throw new Error(result.data.error)
+
+          alert('메모를 등록하였습니다.')
+        }).catch((err) => {
+          alert(err)
+        });
+      });
     }
   }
 }
