@@ -31,12 +31,17 @@
           </v-layout>
         </v-flex>
         <v-flex v-else xl12>
-          <p class="headline">로그인이 필요합니다.</p>
+          <p class="headline mt-12">로그인이 필요합니다.</p>
           <v-layout class="text-center">
             <v-spacer></v-spacer>
             <v-btn color="blue darken-4" tile large dark @click="dotsTab">로그인</v-btn>
             <v-spacer></v-spacer>
           </v-layout>
+          <div class="subtitle-1 mt-12">
+            <span>만약 로그인 후에도 이 화면이 나타난다면</span>
+            <br>
+            <span>DoTS 웹 페이지를 새로고침해주세요.</span>
+          </div>
         </v-flex>
       </v-layout>
     </v-content>
