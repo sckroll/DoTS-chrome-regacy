@@ -20,10 +20,10 @@
 
 // window.addEventListener('storagechange', function(e) {
 //   if (e.detail.type == 'set') {
-//     console.log('LocalStorage value' + e.detail.key + ' set to ' + e.detail.value);
+//     console.log('LocalStorage value ' + e.detail.key + ' set to ' + e.detail.value);
 //   }
 //   else {
-//     console.log('LocalStorage value' + e.detail.key + ' retrieved');
+//     console.log('LocalStorage value ' + e.detail.key + ' retrieved');
 //   }
 // });
 
@@ -34,8 +34,8 @@
 
 localStorage.setItem('tabId', '')
 localStorage.setItem('tabInfo', '')
-localStorage.setItem('prevURL', '')
-localStorage.setItem('currURL', '')
+// localStorage.setItem('prevURL', '')
+// localStorage.setItem('currURL', '')
 localStorage.setItem('openerTabId', '')
 
 // Difference between two arrays of objects in JavaScript
@@ -123,8 +123,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	
 		localStorage.setItem('tabId', request.tabId)
 		localStorage.setItem('tabInfo', JSON.stringify(currTabInfo))
-		localStorage.setItem('prevURL', prevURL)
-		localStorage.setItem('currURL', request.currURL)
+		// localStorage.setItem('prevURL', prevURL)
+		// localStorage.setItem('currURL', request.currURL)
+
+		// 크롬 API content script와 DoTS 웹 페이지 간의 통신을 위한 WebSocket 통신 메소드 사용
+		window.postMessage({
+			type: "getCrawledData", 
+			prevURL: prevURL,
+			currURL: request.currURL
+		}, process.env.NODE_ENV === 'production' ? 'https://dots-00.appspot.com' : 'http://localhost:8080')
 	} else {
 		localStorage.setItem('openerTabId', request.tabId)
 	}

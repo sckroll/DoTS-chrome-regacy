@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "DoTS",
-  "homepage_url": "http://localhost:8080/",
+  "homepage_url": "https://www.dots-00.appspot.com",
   "description": "A Web-crawling-based collaboration tool for any projects",
   "default_locale": "en",
   "permissions": [

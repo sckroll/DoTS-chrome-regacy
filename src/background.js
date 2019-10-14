@@ -8,7 +8,7 @@ const exceptedPages = [
 	'*dots-00.appspot.com*'
 ]
 
-const dotsURL = 'http://localhost:8080/*'
+const dotsURL = process.env.NODE_ENV === 'production' ? 'https://dots-00.appspot.com/*' : 'http://localhost:8080/*'
 
 // 와일드카드 적용 함수
 // https://stackoverflow.com/questions/26246601/wildcard-string-comparison-in-javascript
@@ -27,6 +27,7 @@ chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => 
     localStorage.removeItem("userToken")
     sendResponse({ result: "Token disconnected" });
   }
+  return true
 });
 
 // 탭을 이동할 때마다 이전 URL와 현재 URL을 백엔드로 전달

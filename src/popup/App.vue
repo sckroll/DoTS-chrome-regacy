@@ -62,7 +62,8 @@ export default {
         lastName: '',
         email: '',
         color: ''
-      }
+      },
+      BASE_URL: process.env.NODE_ENV === 'production' ? 'https://dots-00.appspot.com' : 'http://localhost:8080'
     }
   },
   created() {
@@ -81,7 +82,7 @@ export default {
       this.$store.commit('deleteToken')
     },
     dotsTab () {
-      window.open('http://localhost:8080/login');
+      window.open(`${this.BASE_URL}/login`);
       // window.open('https://dots-00.appspot.com/login');
     },
     tagPage () {
