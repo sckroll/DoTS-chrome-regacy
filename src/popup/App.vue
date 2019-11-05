@@ -68,14 +68,17 @@ export default {
   },
   created() {
     const token = localStorage.getItem('userToken')
-    if (!token) this.signout()
+    
+    if (!token) {
+      this.signout()
+    } else {
+      const decoded = jwtDecode(token)
 
-    const decoded = jwtDecode(token)
-
-    this.user.firstName = decoded.first_name
-    this.user.lastName = decoded.last_name
-    this.user.email = decoded.email
-    this.user.color = decoded.color
+      this.user.firstName = decoded.first_name
+      this.user.lastName = decoded.last_name
+      this.user.email = decoded.email
+      this.user.color = decoded.color
+    }
   },
   methods: {
     signout () {
@@ -89,7 +92,8 @@ export default {
       var userEmail = this.user.email
 
       chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
-        axios.post('http://localhost:3000/data/tag', {
+        axios.post(`${this.BASE_URL}/data/tag-or-memo`, {
+          projectName: localStorage.getItem("currProject"),
           currURL: tabs[0].url,
           email: userEmail
         })
@@ -103,11 +107,14 @@ export default {
       });
     },
     saveMemo () {
+      var userEmail = this.user.email
       var newMemo = this.memo
 
       chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
-        axios.post('http://localhost:3000/data/memo', {
+        axios.post(`${this.BASE_URL}/data/tag-or-memo`, {
+          projectName: localStorage.getItem("currProject"),
           currURL: tabs[0].url,
+          email: userEmail,
           memo: newMemo
         })
         .then((result) => {

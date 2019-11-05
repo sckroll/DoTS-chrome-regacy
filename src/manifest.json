@@ -36,7 +36,7 @@
     }
   ],
   "externally_connectable": {
-    "ids": ["jpiagnpijljkijffgaidojpebhmijljc"],
+    "ids": ["*"],
     "matches": ["http://localhost:8080/*", "*://*.dots-00.appspot.com/*"]
   },
   "options_ui": {

@@ -19,14 +19,20 @@ function matchWildcard(str, rule) {
 
 // DoTS 사이트로부터 오는 JWT 로그인 토큰 처리
 chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-  if (request.userToken) {
-    console.log(request.userToken)
-    localStorage.setItem("userToken", request.userToken)
-    sendResponse({ result: "Token connected" });
-  } else {
-    localStorage.removeItem("userToken")
-    sendResponse({ result: "Token disconnected" });
+  if (request.currProject) {
+    localStorage.setItem("currProject", request.currProject)
   }
+
+  if (request.userToken) {
+	  if (request.userToken !== 'logout') {
+      localStorage.setItem("userToken", request.userToken)
+      sendResponse({ result: "Token connected" });
+    } else {
+      localStorage.removeItem("userToken")
+      sendResponse({ result: "Token disconnected" });
+    }
+  }
+
   return true
 });
 

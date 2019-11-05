@@ -1,42 +1,9 @@
 /* eslint-disable prettier/prettier */
 
-// 로컬 저장소 이벤트를 같은 탭에서도 발생하도록 수정
-// https://www.experts-exchange.com/questions/29143892/How-to-Set-JavaScript-Event-Listener-on-Local-Storage-Value-in-Same-Window.html
-// Storage.prototype._setItem = Storage.prototype.setItem;
-// Storage.prototype.setItem = function(key, value)
-// {
-//   var evt = new CustomEvent('storagechange', {detail: {type: 'set', key: key, value: value}});
-//   window.dispatchEvent(evt);
-//   this._setItem(key, JSON.stringify(value));
-// }
-
-// Storage.prototype._getItem = Storage.prototype.getItem;
-// Storage.prototype.getItem = function(key)
-// { 
-//   var evt = new CustomEvent('storagechange', {detail: {type: 'get', key: key}});
-//   window.dispatchEvent(evt);
-//   return this._getItem(key);
-// }
-
-// window.addEventListener('storagechange', function(e) {
-//   if (e.detail.type == 'set') {
-//     console.log('LocalStorage value ' + e.detail.key + ' set to ' + e.detail.value);
-//   }
-//   else {
-//     console.log('LocalStorage value ' + e.detail.key + ' retrieved');
-//   }
-// });
-
-// window.addEventListener('load', function() {
-//   localStorage.setItem('test', '123');
-//   var x = localStorage.getItem('test');
-// });
-
 localStorage.setItem('tabId', '')
 localStorage.setItem('tabInfo', '')
-// localStorage.setItem('prevURL', '')
-// localStorage.setItem('currURL', '')
 localStorage.setItem('openerTabId', '')
+localStorage.setItem('extensionId', chrome.runtime.id)
 
 // Difference between two arrays of objects in JavaScript
 // https://stackoverflow.com/questions/21987909/how-to-get-the-difference-between-two-arrays-of-objects-in-javascript
@@ -96,21 +63,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 					if (prevTabId !== request.tabId) {
 						// 페이지 갱신 전후의 tabId가 다르다면 새 탭에서 웹 페이지 생성
 
+						// 저장된 openerTabId로부터 URL을 추출, 별도의 객체로 저장
+						var newReferrer = currTabInfo.find(result => {
+							console.log('result.id: ' + result.id.toString() + ', ' + typeof result.id.toString())
+							console.log('prevTabId: ' + prevTabId + ', ' + typeof prevTabId)
+							return result.id.toString() === openerTabId
+						})
+						console.log(newReferrer)
+
 						if (request.prevURL.indexOf('www.google') !== -1) {
 							// 구글 검색 결과 페이지에서 새 탭을 열였을 경우
 							// 해당 결과 페이지의 URL을 이전 URL로 사용
 
-							var newReferrer = currTabInfo.find(result => {
-								console.log('result.id: ' + result.id.toString() + ', ' + typeof result.id.toString())
-								console.log('prevTabId: ' + prevTabId + ', ' + typeof prevTabId)
-								return result.id.toString() === openerTabId
-							})
-							console.log(newReferrer)
 							prevURL = newReferrer.url
 						} else {
 							// 그 외의 모든 페이지에서 새 탭을 열였을 경우 referrer를 이전 URL로 사용
+							// 만약 referrer가 빈 문자열이라면 저장된 openerTabId로부터 URL을 추출하여 이전 URL로 사용
 
-							prevURL = request.prevURL
+							if (request.prevURL) {
+								prevURL = request.prevURL
+							} else {
+								prevURL = newReferrer.url
+							}
 						}
 					} else {
 						// 페이지 갱신 전후의 tabId가 같다면 현재 상태 그대로
@@ -123,8 +97,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	
 		localStorage.setItem('tabId', request.tabId)
 		localStorage.setItem('tabInfo', JSON.stringify(currTabInfo))
-		// localStorage.setItem('prevURL', prevURL)
-		// localStorage.setItem('currURL', request.currURL)
 
 		// 크롬 API content script와 DoTS 웹 페이지 간의 통신을 위한 WebSocket 통신 메소드 사용
 		window.postMessage({
