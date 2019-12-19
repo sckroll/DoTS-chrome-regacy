@@ -5,7 +5,8 @@ const exceptedPages = [
 	'chrome://*',
 	'file://*',
 	'*://localhost:*',
-	'*dots-00.appspot.com*'
+	'*dots-00.appspot.com*',
+	'*console.cloud.google.com*'
 ]
 
 const dotsURL = process.env.NODE_ENV === 'production' ? 'https://dots-00.appspot.com/*' : 'http://localhost:8080/*'
